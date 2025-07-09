@@ -1,41 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Affiliate Link Showcase</title>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amazon Affiliate Storefront</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="p-4">
-  <h1 class="mb-3">My Amazon Picks</h1>
-  <div id="items-list" class="list-group"></div>
+  <h1 class="mb-4">My Amazon Picks</h1>
+  <!-- Accordion container -->
+  <div class="accordion" id="surgeryAccordion"></div>
 
-  <!-- Tabletop.js for easy Google Sheets integration -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js"></script>
+  <!-- Papa Parse for CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
-    // Initialize Tabletop to fetch your published sheet
-    window.onload = function() {
-      Tabletop.init({
-        key: '12f-5gYolM5ESAxpXTBRyDvW9pvwYivJBRnpQspTOnDo',
-        callback: renderItems,
-        simpleSheet: true
-      });
-    };
+    // URL to your published Google Sheet as CSV
+    const PUBLIC_CSV_URL = 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/pub?output=csv';
 
-    // Render function: loops through rows and appends links
-    function renderItems(data) {
-      const list = document.getElementById('items-list');
-      data.forEach(row => {
-        const a = document.createElement('a');
-        a.href = row.AffiliateLink_Web;             // Column header "AffiliateLink_Web"
-        a.textContent = row.Name;      // Column header "Name"
-        a.className = 'list-group-item list-group-item-action';
-        a.target = '_blank';
-        list.appendChild(a);
+    // Run on DOM ready
+    window.addEventListener('DOMContentLoaded', () => {
+      Papa.parse(PUBLIC_CSV_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: results => renderAccordion(results.data),
+        error: err => console.error('Papa Parse error:', err)
       });
+    });
+
+    // Group rows by the 'Surgery' column
+    function groupBySurgery(data) {
+      return data.reduce((groups, row) => {
+        const category = row.Surgery || 'Uncategorized';
+        groups[category] = groups[category] || [];
+        groups[category].push(row);
+        return groups;
+      }, {});
+    }
+
+    // Render Bootstrap accordion
+    function renderAccordion(data) {
+      const groups = groupBySurgery(data);
+      const accordion = document.getElementById('surgeryAccordion');
+      let idx = 0;
+
+      for (const [category, items] of Object.entries(groups)) {
+        const headingId = `heading${idx}`;
+        const collapseId = `collapse${idx}`;
+        idx++;
+
+        // Accordion item
+        const itemHTML = `
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="${headingId}">
+              <button class="accordion-button collapsed" type="button"
+                      data-bs-toggle="collapse" data-bs-target="#${collapseId}"
+                      aria-expanded="false" aria-controls="${collapseId}">
+                ${category}
+              </button>
+            </h2>
+            <div id="${collapseId}" class="accordion-collapse collapse"
+                 aria-labelledby="${headingId}" data-bs-parent="#surgeryAccordion">
+              <div class="accordion-body">
+                <ul class="list-unstyled mb-0">
+                  ${items.map(row =>
+                    `<li><a href="${row.AffiliateLink_Web}" target="_blank">${row.Name}</a></li>`
+                  ).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>`;
+        accordion.insertAdjacentHTML('beforeend', itemHTML);
+      }
     }
   </script>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
