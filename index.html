@@ -7,23 +7,43 @@
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* Optional: add a bit more spacing around cards */
+    /* Make all cards equal height and add hover effect */
     .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
       transition: transform .2s, box-shadow .2s;
     }
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
     }
+
+    /* Fix image box height and cover */
+    .card-img-top {
+      height: 180px;           /* adjust as needed */
+      object-fit: cover;
+    }
+
+    /* Ensure card body grows to push the stretched-link to bottom */
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-title, .card-text {
+      margin-bottom: 0.5rem;
+    }
+    .stretched-link {
+      margin-top: auto;        /* push link to bottom of body */
+    }
   </style>
 </head>
 <body class="p-4">
   <h1 class="mb-4">My Amazon Picks</h1>
 
-  <!-- Accordion wrapper -->
   <div class="accordion" id="surgeryAccordion"></div>
 
-  <!-- Papa Parse for CSV parsing -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTszObAw-SwSUXsQpAO7IoXgT_1PnYZFxJOTD_6sLa-md0J7ADUTiQwpk4uOOv13P9le07M9jPhBeyq/pub?gid=0&single=true&output=csv';
@@ -38,7 +58,6 @@
       });
     });
 
-    // Group rows by Surgery category
     function groupBySurgery(data) {
       return data.reduce((groups, row) => {
         const cat = row.Surgery || 'Uncategorized';
@@ -47,7 +66,6 @@
       }, {});
     }
 
-    // Build accordion with cards
     function buildAccordion(data) {
       const groups = groupBySurgery(data);
       const acc = document.getElementById('surgeryAccordion');
@@ -57,10 +75,8 @@
         const hid = `heading${idx}`, cid = `collapse${idx}`;
         idx++;
 
-        // Accordion item wrapper
         const item = document.createElement('div');
         item.className = 'accordion-item mb-3';
-
         item.innerHTML = `
           <h2 class="accordion-header" id="${hid}">
             <button class="accordion-button collapsed" type="button"
@@ -74,8 +90,8 @@
             <div class="accordion-body">
               <div class="row g-3">
                 ${items.map(row => `
-                  <div class="col-sm-6 col-md-4 col-lg-3">
-                    <div class="card h-100 position-relative">
+                  <div class="col-sm-6 col-md-4 col-lg-3 d-flex">
+                    <div class="card w-100">
                       <img src="${row.Image}" class="card-img-top" alt="${row.Name}">
                       <div class="card-body">
                         <h5 class="card-title">${row.Name}</h5>
@@ -92,7 +108,7 @@
       }
     }
   </script>
-  <!-- Bootstrap 5 JS Bundle (includes Collapse) -->
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
