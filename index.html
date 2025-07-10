@@ -21,8 +21,11 @@
 
     /* Fix image box height and cover */
     .card-img-top {
-      height: 180px;           /* adjust as needed */
-      object-fit: cover;
+      width: 100%;
+      height: 180px;           /* keep a uniform box height */
+      object-fit: contain;     /* scale the whole image inside */
+      background-color: #f8f9fa; /* optional: neutral backdrop for letterboxing */
+      padding: 0.5rem;         /* optional: a little breathing room */
     }
 
     /* Ensure card body grows to push the stretched-link to bottom */
