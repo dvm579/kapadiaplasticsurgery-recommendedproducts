@@ -1,54 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dr. K's Recommended Post-Surgical Products</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="icon" type="image/png" href="https://influx-site-assets.s3.us-west-2.amazonaws.com/kapadiaplasticsurgery.com/logos/favicon.png">
+
+  <!-- Bootstrap 5 (layout & accordion JS only; we’ll theme it below) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="https://influx-site-assets.s3.us-west-2.amazonaws.com/kapadiaplasticsurgery.com/logos/favicon.png" />
+
   <style>
-    /* Make all cards equal height and add hover effect */
-    .card {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
+    /* =========================
+       Kapadia Plastic Surgery theme
+       (derived from screenshots + computed styles you provided)
+       ========================= */
+    :root{
+      /* Typography */
+      --font-sans: "proxima-nova", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      --text-size: 16px;
+      --text-line: 1.8;
+      --weight-light: 300;
+      --weight-bold: 600;
+
+      /* Colors */
+      --kps-black: #000000;
+      --kps-text:  #323341;
+      --kps-white: #ffffff;
+      --kps-accent:#6ca4d4; /* light steel/sky blue used on site */
+      --kps-muted: #6b6e7f;
+      --kps-border:#e5e7ee;
+
+      /* Radius & spacing */
+      --kps-r1: 6px;
+      --kps-r2: 10px;
+      --kps-space-2: 16px;
+      --kps-space-3: 24px;
+      --kps-space-4: 32px;
+    }
+
+    /* Base */
+    html{box-sizing:border-box}
+    *,*::before,*::after{box-sizing:inherit}
+
+    body{
+      font-family: var(--font-sans);
+      font-size: var(--text-size);
+      line-height: var(--text-line);
+      font-weight: var(--weight-light);
+      color: var(--kps-text);
+      background: var(--kps-white);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Headings */
+    h1,h2,h3,h4,h5,h6{
+      color: var(--kps-text);
+      line-height: 1.2;
+      font-weight: var(--weight-bold);
+      margin: var(--kps-space-3) 0 var(--kps-space-2);
+    }
+    h1{ font-size: clamp(28px,4vw,42px); }
+    h2{ font-size: clamp(24px,3.2vw,34px); }
+    h3{ font-size: clamp(20px,2.6vw,28px); }
+
+    /* Accent, links, buttons */
+    a{ color: var(--kps-accent); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .kps-btn{
+      display:inline-block;
+      background: var(--kps-black);
+      color: var(--kps-white);
+      padding: 12px 22px;
+      border: 1px solid var(--kps-black);
+      border-radius: var(--kps-r1);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-weight: var(--weight-bold);
+      line-height: 1.2;
+    }
+    .kps-btn:hover{ background: var(--kps-accent); border-color: var(--kps-accent); color:#fff; text-decoration:none; }
+
+    /* =========================
+       Components used on this page
+       ========================= */
+
+    /* Accordion: remove artifacts, make borders fit exactly, subtle chrome */
+    .accordion{ --bs-accordion-active-bg: #fff; --bs-accordion-active-color: var(--kps-text); }
+    .accordion-item{
+      border:1px solid var(--kps-border);
+      border-radius: var(--kps-r2);
+      overflow:hidden;                 /* <- prevents the white sliver under headers */
+      background:#fff;
+    }
+    .accordion-item + .accordion-item{ margin-top: var(--kps-space-2); }
+    .accordion-button{
+      font-weight: var(--weight-bold);
+      padding: 1rem 1.25rem;
+      background:#fff;
+      color: var(--kps-text);
+      box-shadow:none !important;      /* no glow */
+    }
+    .accordion-button:not(.collapsed){
+      color: var(--kps-text);
+      background:#fff;
+      border-bottom:1px solid var(--kps-border);
+    }
+    .accordion-button:focus{ box-shadow:none; border-color: var(--kps-border); }
+    .accordion-body{ padding: var(--kps-space-3); }
+
+    /* Card grid for products */
+    .card{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      border:1px solid var(--kps-border);
+      border-radius: var(--kps-r2);
       transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
     }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    .card:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    }
+    .card-img-top{
+      width:100%;
+      height:180px;
+      object-fit:contain;
+      background:#f6f7f9;
+      padding:.5rem;
+      border-bottom:1px solid var(--kps-border);
+    }
+    .card-body{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:.35rem;
+      padding: 0.9rem 1rem 1rem 1rem;
+    }
+    .card-title{ font-weight: var(--weight-bold); margin:0; }
+    .card-text{ color: var(--kps-muted); margin:0; }
+    .stretched-link{ margin-top:auto; } /* push the link anchor to bottom */
+
+    /* Optional page header styling */
+    .kps-page-title{
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    .kps-subtle-rule{
+      height:1px; background:var(--kps-border); border:0; margin: 0 0 var(--kps-space-2);
     }
 
-    /* Fix image box height and cover */
-    .card-img-top {
-      width: 100%;
-      height: 180px;           /* keep a uniform box height */
-      object-fit: contain;     /* scale the whole image inside */
-      background-color: #f8f9fa; /* optional: neutral backdrop for letterboxing */
-      padding: 0.5rem;         /* optional: a little breathing room */
-    }
-
-    /* Ensure card body grows to push the stretched-link to bottom */
-    .card-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .card-title, .card-text {
-      margin-bottom: 0.5rem;
-    }
-    .stretched-link {
-      margin-top: auto;        /* push link to bottom of body */
-    }
+    /* Make container edges breathe on small screens */
+    .kps-wrap{ max-width:1200px; margin:0 auto; }
   </style>
 </head>
+
 <body class="p-4">
-  <h1 class="mb-4">Dr. Kapadia's Recommended Post-Surgical Products</h1>
+  <main class="kps-wrap">
+    <h1 class="kps-page-title">Dr. Kapadia’s Recommended Post-Surgical Products</h1>
+    <hr class="kps-subtle-rule" />
 
-  <div class="accordion" id="surgeryAccordion"></div>
+    <div class="accordion" id="surgeryAccordion"></div>
+  </main>
 
+  <!-- PapaParse for CSV -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <script>
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTszObAw-SwSUXsQpAO7IoXgT_1PnYZFxJOTD_6sLa-md0J7ADUTiQwpk4uOOv13P9le07M9jPhBeyq/pub?gid=0&single=true&output=csv';
 
@@ -57,30 +177,28 @@
         download: true,
         header: true,
         skipEmptyLines: true,
-        complete: results => buildAccordion(results.data),
-        error: err => console.error('Papa Parse error:', err)
+        complete: (results) => buildAccordion(results.data)
       });
     });
 
-    function groupBySurgery(data) {
-      return data.reduce((groups, row) => {
-        const cat = row.Surgery || 'Uncategorized';
-        (groups[cat] = groups[cat]||[]).push(row);
-        return groups;
-      }, {});
+    function groupBySurgery(rows){
+      return rows.reduce((m,row)=>{
+        const k = row.Surgery && row.Surgery.trim() ? row.Surgery : 'Uncategorized';
+        (m[k] = m[k] || []).push(row);
+        return m;
+      },{});
     }
 
-    function buildAccordion(data) {
+    function buildAccordion(data){
       const groups = groupBySurgery(data);
       const acc = document.getElementById('surgeryAccordion');
-      let idx = 0;
+      let i = 0;
 
-      for (const [category, items] of Object.entries(groups)) {
-        const hid = `heading${idx}`, cid = `collapse${idx}`;
-        idx++;
+      for (const [category, items] of Object.entries(groups)){
+        const hid = `heading${i}`, cid = `collapse${i}`; i++;
 
         const item = document.createElement('div');
-        item.className = 'accordion-item mb-3';
+        item.className = 'accordion-item';
         item.innerHTML = `
           <h2 class="accordion-header" id="${hid}">
             <button class="accordion-button collapsed" type="button"
@@ -96,11 +214,11 @@
                 ${items.map(row => `
                   <div class="col-sm-6 col-md-4 col-lg-3 d-flex">
                     <div class="card w-100">
-                      <img src="${row.Image}" class="card-img-top" alt="${row.Name}">
+                      <img src="${row.Image || ''}" class="card-img-top" alt="${row.Name || 'Product image'}">
                       <div class="card-body">
-                        <h5 class="card-title">${row.Name}</h5>
-                        <p class="card-text">${row.Price}</p>
-                        <a href="${row.AffiliateLink_Web}" class="stretched-link"></a>
+                        <h5 class="card-title">${row.Name || ''}</h5>
+                        <p class="card-text">${row.Price || ''}</p>
+                        <a href="${row.AffiliateLink_Web || '#'}" class="stretched-link" aria-label="Open ${row.Name || 'product'}"></a>
                       </div>
                     </div>
                   </div>
